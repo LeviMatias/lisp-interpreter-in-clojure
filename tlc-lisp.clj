@@ -11,6 +11,9 @@
 (declare evaluar-cond)
 (declare evaluar-secuencia-en-cond)
 
+(load-file "macros.clj")
+(load-file "aux-functions.clj")
+
 ; REPL (read–eval–print loop).
 ; Aridad 0: Muestra mensaje de bienvenida y se llama recursivamente con el ambiente inicial.
 ; Aridad 1: Muestra >>> y lee una expresion y la evalua.
