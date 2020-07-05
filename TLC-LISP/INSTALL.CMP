@@ -1,0 +1,67 @@
+To install  thå P-codå compileò, assembler, and disassembler:
+
+1.  Copy the *.P files onto your system disk.
+
+2®  Adä thå followinç codå tï enä oæ youò LISP.SYS® Yoõ caî uså 
+the LISP editor to do this.
+
+
+; For convenience we define a list of the  compiler files:
+;
+(setq comp-files
+  '( "lap" "dispcode" "comp" "compargs" "compdo"
+     "comp2" "compfile" "opt"))))
+
+
+»  No÷ wå definå á dummù versioî oæ COMPILÅ tï loaä thå  compileò  
+; at its first reference
+;
+(df :COMPILE (l)
+  (eprin0 " Loading Compiler...")
+  (pload-list comp-files)
+  (terpri)
+  (eval (concat 'compile l))
+)))
+
+
+; DEFPCODE -- a driver to prepare User-defined P-code for the 
+;              assembler.
+;
+(df :DEFPCODE (l
+  &AUX (name (first l))
+	(args (second l))
+	(body (rest l 2)) )
+  (set name (apply pcode (lap body)))
+  name
+)))
+
+
+; DIS -- A disassembler that will display the P-code.
+;        Note that the arguement is a function, not the name of
+;         function.
+;
+(de :DIS (p)
+  (eprin0 " Loading...") (terpri)
+  (pload "lap.p")(pload "dispcode.p")
+  (dis p)  )))
+ 
+
+; LAP --  Like DIS, to load the assembler.
+;
+(de lap  (p)
+  (eprin0 " Loading...") (terpri)
+  (pload "lap.p")(pload "dispcode.p")
+  (lap p)   )))
+Š
+; Finally a few stubs to civilize references to the 
+; Native  Mode Module
+
+(de :DIS-ASM (l) (native-error))
+
+(de :COMP-CODE (l) (native-error))
+
+(DE :COMP-ASM (l) (native-error))
+
+(de native-error ()(error "native mode option is required")))
+
+

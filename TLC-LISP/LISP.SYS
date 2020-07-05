@@ -1,0 +1,70 @@
+; LISP.SYS for IBM
+
+(if (gt (free 'bytes) 60000)
+    (buffer 5000) )
+)))
+
+(pkg "util")
+(pkg "comp")
+(pkg "asm")
+(pkg "pp")
+(pkg "edit")
+
+(gcstack 5000)
+
+(setq smash nil
+      gcbeep nil
+      input-base 16
+      :vset store
+      :ieq eq )
+
+(setq save-list (list (closure load '(a 1)) (newpcode 0))))
+
+(df :DECLARE (l)
+)))
+
+(df :INCLUDE (l)
+)))
+
+(df :REMOVE-MACROS (l)
+)))
+
+(setq sys-files '( "lisp" "sys" "print" "debug" "pkg"
+		  "msdos" "sort" "class" )
+)))
+
+(de :PLOAD-LIST (l-list)
+   (mapc (lambda (x) (print (pload  (string x ".p"))))
+	  l-list))))
+
+; MAPC -- This version will be overwritten from the load
+;
+(de mapc (fn %l)
+    (if (null %l) () (fn (car %l)) (mapc fn (cdr %l)))))
+
+(df :EDIT (l)	  ; load editor when needed
+  (prin3 "Loading Editor...")
+  (pload "edit.p")
+  (eval (concat edit l))
+)))
+
+(pload-list sys-files)
+(print (load "IBM"))
+
+(de EDIT:DELAY (&OPT (n 1))
+  (rep 1000 (rep n)) )))Š
+
+(de :PP (a &OPT b)
+  (prin3 " Loading Pretty Printer...")
+  (pload "pp.p")
+  (terpri)
+  (if (boundp 'b)
+      (pp a b)
+      (pp a) )
+)))
+
+
+"LISP.SYS loaded"
+
+)))
+
