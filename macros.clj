@@ -1,3 +1,5 @@
+;;not needed
+
 (defmacro de
 "defines a function" 
 [fname args & body]

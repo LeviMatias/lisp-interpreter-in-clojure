@@ -123,9 +123,18 @@
 												        (igual? (first lae) nil) nil
 												        (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
 										                true (ffirst lae)))
+							(igual? f 'reverse) (let [ari (controlar-aridad lae 1)]
+												(cond (seq? ari)) ari
+													(igual? (first lae) nil) nil
+													(not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
+													true (reverse (first lae)))
 							(igual? f 'add) (if (< (count lae) 2)
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce + lae) 
+												     (catch Exception e (list '*error* 'number-expected))))
+							(igual? f 'sub) (if (< (count lae) 2)
+							                    (list '*error* 'too-few-args)
+							                    (try (reduce - lae) 
 												     (catch Exception e (list '*error* 'number-expected))))
 							true (let [lamb (buscar f (concat amb-local amb-global))]
 								    (cond (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)

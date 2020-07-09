@@ -13,7 +13,17 @@
 ))
 
 (defn is-nil? [a](
-    or (nil? a) (= a 'NIL) (= a "NIL") (and (coll? a) (= (count a) '0))
+    or (nil? a) (= a 'NIL) (= a "NIL") (= a '())
+))
+
+(defn get!nil [e](
+    if (is-nil a)
+        nil
+        e
+))
+
+(defn prnt [e](
+    pr (get!nil e)
 ))
 
 ;;;;;;;;;;;;;;
@@ -32,9 +42,9 @@
 
 (defn controlar-aridad [lis val-esperado](
     cond (> (count lis) val-esperado)
-        ((list '*error* 'too-many-args)
+        (list '*error* 'too-many-args)
     (< (count lis) val-esperado)
-        ((list '*error* 'too-few-args))
+        (list '*error* 'too-few-args)
     true
         val-esperado
 ))
@@ -60,9 +70,9 @@
 (defn buscar [elem amb](
     reduce (
         fn[a b](
-            cond (not(nil? a))
+            cond (not (nil? a))
                 a 
-            (not(nil? b))
+            (not (nil? b))
                 b 
             true
                 nil
@@ -80,26 +90,26 @@
     do
     (cond (coll-and-error? v)
         (do 
-        (apply pr v)
+        (apply prnt v)
         (newline)
         (flush)
         )
     (not= v '\space) 
         (do 
-        (pr v)
+        (prnt v)
         (newline)
         (flush)
         )
-    )
-    
-    v
+    ) 
+    (get!nil v)
+
 ))([lis orig](
     cond (nil? lis)(do
         (newline)
         (flush)
-    orig
+        (get!nil orig)
     ) true (do
-        (pr (first lis))
+        (prnt (first lis))
         (print \space)
         (imprimir (rest lis) orig)
     )
