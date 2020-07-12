@@ -1,9 +1,5 @@
 
 ;;;;;;;;utility
-(defn coll-and-error?[l]
-    (and (coll? l) (= (first l) '*error*))
-)
-
 (defn in-pairs[l f](
   map f (partition 2 l)
 ))
@@ -16,17 +12,15 @@
     or (nil? a) (= a 'NIL) (= a "NIL") (= a '())
 ))
 
-(defn get!nil [e](
-    if (is-nil? e)
-        nil
-        e
+(defn parse-nil [e](
+    if (is-nil? e) nil e
 ))
 
 (defn convert-nils [l](
   cond (coll? l)
-    (map (fn [elem](get!nil elem)) l)
+    (map (fn [elem](parse-nil elem)) l)
     true
-    (get!nil l)
+    (parse-nil l)
 ))
 
 (defn prnt [e](
@@ -58,27 +52,35 @@
         val-esperado
 ))
 
-(defn revisar-f[lis](
-    cond (coll-and-error? lis)
-        lis
+(defn aplicar-fl-lae [f lae](
+    let [ari (controlar-aridad lae 1)]
+    (cond (seq? ari) ari
+        (igual? (first lae) nil) nil
+        (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
+        true (f (first lae))
+    )
+))
+
+(defn revisar-f[l](
+    cond (and (coll? l) (= (first l) '*error*))
+        l
     true
         nil
 ))
 
-(defn revisar-lae[lis](
-    (reduce (fn [a b] (
-        cond (coll-and-error? a)
+(defn revisar-lae [lis](
+    reduce (fn [a b] (
+        cond (and (revisar-f a))
             a
-        (coll-and-error? b)
+        (revisar-f b)
             b
         true
             nil
-    )) lis)
+    )) lis
 ))
 
 (defn buscar [elem amb](
-    reduce (
-        fn[a b](
+    reduce ( fn[a b](
             cond (not (nil? a))
                 a 
             (not (nil? b))
@@ -88,16 +90,15 @@
         )
     )
     (in-pairs amb #(
-        if (= elem (first %))
-            (second %)
-            nil
-    ))
+        if (= elem (first %)) (second %) nil
+        )
+    )
 )
 )
 
 (defn imprimir ([v](
     do
-    (cond (coll-and-error? v)
+    (cond (revisar-f v)
         (do 
         (map prnt v)
         (newline)
@@ -127,14 +128,12 @@
 )
 
 (defn actualizar-amb [amb-global clave valor]
-    (cond (coll-and-error? valor)
+    (cond (revisar-f valor)
         amb-global
     (amb-contains? amb-global clave)
         (apply concat (
           in-pairs amb-global #(
-            if (= clave (first %)) 
-              (list (first %) valor) 
-              %
+            if (= clave (first %)) (list (first %) valor)  % 
             ) 
           )
         )

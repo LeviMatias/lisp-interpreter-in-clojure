@@ -11,7 +11,8 @@
 (declare evaluar-cond)
 (declare evaluar-secuencia-en-cond)
 
-(load-file "macros.clj")
+(declare aplicar-f-lae)
+
 (load-file "aux-functions.clj")
 
 ; REPL (read–eval–print loop).
@@ -75,6 +76,7 @@
 	(if (not (seq? expre))
 		(if (or (number? expre) (string? expre)) (list expre amb-global) (list (buscar expre (concat amb-local amb-global)) amb-global))
 		(cond (igual? expre nil) (list nil amb-global)
+			  (igual? (first expre) 't) (list true amb-global)
 		      (igual? (first expre) '*error*) (list expre amb-global)
 		      (igual? (first expre) 'exit) (if (< (count (next expre)) 1) (list nil nil) (list (list '*error* 'too-many-args) amb-global))
 	          (igual? (first expre) 'setq) (cond (< (count (next expre)) 2) (list (list '*error* 'list 'expected nil) amb-global)
@@ -93,6 +95,7 @@
 			  (igual? (first expre) 'lambda) (cond (< (count (next expre)) 1) (list (list '*error* 'list 'expected nil) amb-global)
 											       (and (not (igual? (fnext expre) nil)) (not (seq? (fnext expre)))) (list (list '*error* 'list 'expected (fnext expre)) amb-global)
 											       true (list expre amb-global))
+			  (igual? (first expre) 'load)()
    			  (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
 			  true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local)))
 )
@@ -115,19 +118,17 @@
 		    resu2 (list resu2 amb-global)
 		    true  (if (not (seq? f))
 		              (list (cond
+					  		(igual? f 'terpri)(do (newline) nil)
+							(igual? f 'prin3)(if (> (count lae) 0)
+							                    (list '*error* 'too-many-args)
+												(do (prnt (first lae)) (first lae))
   			                (igual? f 'env) (if (> (count lae) 0)
 							                    (list '*error* 'too-many-args)
 												(concat amb-global amb-local))
-							(igual? f 'first) (let [ari (controlar-aridad lae 1)]
-							                      (cond (seq? ari) ari
-												        (igual? (first lae) nil) nil
-												        (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
-										                true (ffirst lae)))
-							(igual? f 'reverse) (let [ari (controlar-aridad lae 1)]
-												(cond (seq? ari)) ari
-													(igual? (first lae) nil) nil
-													(not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
-													true (reverse (first lae)))
+							;;logic & math
+							(igual? f' not)	(if (< (count lae) 1)
+							                    (list '*error* 'too-few-args))
+												(not (first lae))
 							(igual? f 'add) (if (< (count lae) 2)
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce + lae) 
@@ -136,6 +137,15 @@
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce - lae) 
 												     (catch Exception e (list '*error* 'number-expected))))
+							
+													 
+							;;list
+							(igual? f 'first) (aplicar-fl-lae ffirst lae)
+							(igual? f 'reverse) (aplicar-fl-lae reverse lae)
+							(igual f 'length) (aplicar-fl-lae length lae )
+							(igual f 'rest) (aplicar-fl-lae rest lae)
+							(igual f 'list) (apply list lae)
+
 							true (let [lamb (buscar f (concat amb-local amb-global))]
 								    (cond (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)
 		                                  (or (number? f) (igual? f 't) (igual? f nil)) (list '*error* 'non-applicable-type f)
