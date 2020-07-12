@@ -17,14 +17,23 @@
 ))
 
 (defn get!nil [e](
-    if (is-nil a)
+    if (is-nil? e)
         nil
         e
 ))
 
-(defn prnt [e](
-    pr (get!nil e)
+(defn convert-nils [l](
+  cond (coll? l)
+    (map (fn [elem](get!nil elem)) l)
+    true
+    (get!nil l)
 ))
+
+(defn prnt [e](
+    pr (convert-nils e)
+))
+
+
 
 ;;;;;;;;;;;;;;
 
@@ -90,7 +99,7 @@
     do
     (cond (coll-and-error? v)
         (do 
-        (apply prnt v)
+        (map prnt v)
         (newline)
         (flush)
         )
@@ -101,17 +110,18 @@
         (flush)
         )
     ) 
-    (get!nil v)
+    (convert-nils v)
 
 ))([lis orig](
-    cond (nil? lis)(do
+    cond (or (nil? lis) (nil? orig))(do
         (newline)
         (flush)
-        (get!nil orig)
+        (convert-nils orig)
     ) true (do
         (prnt (first lis))
         (print \space)
         (imprimir (rest lis) orig)
+        (convert-nils orig)
     )
 ))
 )
