@@ -10,3 +10,15 @@
     )
 ))
 
+(defn try-number-comp [f lae](
+    let [ari (controlar-aridad lae 2)]
+    (if (seq? ari) ari
+    (try (f (first lae) (second lae)) 
+            (catch Exception e (list '*error* 'number-expected))))
+))
+
+;(defn try-number-comp [f lae](
+;    if (<= (count lae) 1) (list '*error* 'too-few-args)
+;    (try (f (first lae) (second lae)) 
+;            (catch Exception e (list '*error* 'number-expected)))
+;))

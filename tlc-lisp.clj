@@ -129,6 +129,11 @@
   			                (igual? f 'env) (if (> (count lae) 0)
 							                    (list '*error* 'too-many-args)
 												(concat amb-global amb-local))
+							(igual? f 'eval)(let [ari (controlar-aridad lae 1)]
+   												(if (seq? ari) ari
+												(try (eval (first lae)) 
+												     (catch Exception e (list '*error* 'eval-failed-cant-resolve)))))
+
 							;;logic & math
 							(igual? f 'not)	(let [ari (controlar-aridad lae 2)]
    												(if (seq? ari) ari
@@ -141,10 +146,14 @@
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce - lae) 
 												     (catch Exception e (list '*error* 'number-expected))))
-							(igual? f 'gt) (let [ari (controlar-aridad lae 2)]
-   												(if (seq? ari) ari
-							                    (try (> (first lae) (second lae)) 
-												     (catch Exception e (list '*error* 'number-expected)))))
+							(igual? f 'gt) (try-number-comp > lae)
+							(igual? f 'ge) (try-number-comp >= lae)
+							(igual? f 'lt) (try-number-comp < lae)
+							(igual? f 'le) (try-number-comp <= lae)
+							(igual? f 'equal) (try-number-comp igual? lae); works even if they are not numbers (special case)
+							(igual? f 'null) (if (< (count lae) 1)
+							                    (list '*error* 'too-few-args)
+												(reduce (fn [a b](or a b)) (map is-nil? lae)))
 													 
 							;;list
 							(igual? f 'first) (aplicar-fl-lae ffirst lae)
@@ -152,6 +161,14 @@
 							(igual? f 'length) (aplicar-fl-lae count lae )
 							(igual? f 'rest) (aplicar-fl-lae rest lae)
 							(igual? f 'list) (apply list lae)
+							(igual? f 'cons)(let [ari (controlar-aridad lae 2)]
+   												(if (seq? ari) ari)
+												(try (cons (first lae) (second lae)) 
+												     (catch Exception e (list '*error* 'list-expected-2nd-arg))))
+							(igual? f 'append)(let [ari (controlar-aridad lae 2)]
+   												(if (seq? ari) ari)
+												(try (concat (first lae) (second lae)) 
+												     (catch Exception e (list '*error* 'list-expected))))
 
 							true (let [lamb (buscar f (concat amb-local amb-global))]
 								    (cond (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)
