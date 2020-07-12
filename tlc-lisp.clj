@@ -13,6 +13,10 @@
 
 (declare aplicar-f-lae)
 
+(load-file "utility.clj")
+(load-file "print.clj")
+(load-file "control.clj")
+(load-file "environ.clj")
 (load-file "aux-functions.clj")
 
 ; REPL (read–eval–print loop).
@@ -119,16 +123,16 @@
 		    true  (if (not (seq? f))
 		              (list (cond
 					  		(igual? f 'terpri)(do (newline) nil)
-							(igual? f 'prin3)(if (> (count lae) 0)
-							                    (list '*error* 'too-many-args)
-												(do (prnt (first lae)) (first lae))
+							(igual? f 'prin3)(let [ari (controlar-aridad lae 1)]
+   												(if (seq? ari) ari
+												(do (prnt (first lae)) (first lae))))
   			                (igual? f 'env) (if (> (count lae) 0)
 							                    (list '*error* 'too-many-args)
 												(concat amb-global amb-local))
 							;;logic & math
-							(igual? f' not)	(if (< (count lae) 1)
-							                    (list '*error* 'too-few-args))
-												(not (first lae))
+							(igual? f 'not)	(let [ari (controlar-aridad lae 2)]
+   												(if (seq? ari) ari
+												(not (first lae))))
 							(igual? f 'add) (if (< (count lae) 2)
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce + lae) 
@@ -137,14 +141,17 @@
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce - lae) 
 												     (catch Exception e (list '*error* 'number-expected))))
-							
+							(igual? f 'gt) (let [ari (controlar-aridad lae 2)]
+   												(if (seq? ari) ari
+							                    (try (> (first lae) (second lae)) 
+												     (catch Exception e (list '*error* 'number-expected)))))
 													 
 							;;list
 							(igual? f 'first) (aplicar-fl-lae ffirst lae)
 							(igual? f 'reverse) (aplicar-fl-lae reverse lae)
-							(igual f 'length) (aplicar-fl-lae length lae )
-							(igual f 'rest) (aplicar-fl-lae rest lae)
-							(igual f 'list) (apply list lae)
+							(igual? f 'length) (aplicar-fl-lae count lae )
+							(igual? f 'rest) (aplicar-fl-lae rest lae)
+							(igual? f 'list) (apply list lae)
 
 							true (let [lamb (buscar f (concat amb-local amb-global))]
 								    (cond (or (number? lamb) (igual? lamb 't) (igual? lamb nil)) (list '*error* 'non-applicable-type lamb)
@@ -162,4 +169,4 @@
 
 ; Falta implementar las 9 funciones auxiliares (actualizar-amb, controlar-aridad, imprimir, buscar, etc.)
 
-; Falta hacer que la carga del interprete en Clojure (tlc-lisp.clj) retorne true 
+((fn [] true))
