@@ -122,14 +122,14 @@
 ; en caso de haber multiples cuerpos, se llama a aplicar recursivamente, pasando la funcion lambda sin el primer cuerpo, la lista de argumentos evaluados,
 ; el amb. global actualizado con la eval. del 1er. cuerpo (usando el amb. global intacto y el local actualizado con los params. ligados a los args.) y el amb. local intacto. 
 (defn aplicar
-   ([f lae amb-global amb-local]
-      (aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
+   ([f lae amb-global amb-local](
+    aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
    ([resu1 resu2 f lae amb-global amb-local]
       (cond resu1 (list resu1 amb-global)
 		    resu2 (list resu2 amb-global)
 		    true  (if (not (seq? f))
 		              (list (cond
-					  		(igual? f 'terpri)(do (newline) nil)
+					  		(igual? f 'terpri) (newline)
 							(igual? f 'prin3)(let [ari (controlar-aridad lae 1)]
    												(if (seq? ari) ari
 												(do (prnt (first lae)) (first lae))))
@@ -156,7 +156,7 @@
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce - lae) 
 												     (catch Exception e (list '*error* 'number-expected))))
-							(igual? f 'gt) (try-number-comp > lae)
+							(igual? f 'gt) (do (pr (first lae)) (try-number-comp > lae))
 							(igual? f 'ge) (try-number-comp >= lae)
 							(igual? f 'lt) (try-number-comp < lae)
 							(igual? f 'le) (try-number-comp <= lae)

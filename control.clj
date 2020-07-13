@@ -17,12 +17,15 @@
 ))
 
 (defn revisar-lae [lis](
-    reduce (fn [a b] (
+    cond (= (count lis) 1) (revisar-f (first lis))
+    (= (count lis) 0) 'nil
+    true
+    (reduce (fn [a b] (
         cond (and (revisar-f a))
             a
         (revisar-f b)
             b
         true
             nil
-    )) lis
+    )) lis )
 ))

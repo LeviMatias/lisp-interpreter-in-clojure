@@ -10,11 +10,7 @@
 (defn imprimir ([v](
     do
     (cond (revisar-f v)
-        (do 
-        (map prnt v)
-        (newline)
-        (flush)
-        )
+        (imprimir v v)
     (not= v '\space) 
         (do 
         (prnt v)
@@ -32,8 +28,7 @@
     ) true (do
         (prnt (first lis))
         (print \space)
-        (imprimir (rest lis) orig)
-        (convert-nils orig)
+        (imprimir (next lis) orig)
     )
 ))
 )
