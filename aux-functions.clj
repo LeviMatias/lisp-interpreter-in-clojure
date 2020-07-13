@@ -10,10 +10,16 @@
     )
 ))
 
+(defn run-comp[f lae](
+    if (f (parse-nil (first lae)) (parse-nil (second lae)) )
+    't
+    'nil
+)) 
+
 (defn try-number-comp [f lae](
     let [ari (controlar-aridad lae 2)]
     (if (seq? ari) ari
-    (try (f (first lae) (second lae)) 
+    (try (run-comp f lae) 
             (catch Exception e (list '*error* 'number-expected))))
 ))
 

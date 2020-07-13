@@ -2,7 +2,7 @@
 (load-file "control.clj")
 
 (defn buscar [elem amb](
-    reduce ( fn[a b](
+    reduce ( fn [a b](
             cond (not (nil? a))
                 a 
             (not (nil? b))

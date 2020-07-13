@@ -17,6 +17,7 @@
 (load-file "print.clj")
 (load-file "control.clj")
 (load-file "environ.clj")
+(load-file "eval.clj")
 (load-file "aux-functions.clj")
 
 ; REPL (read–eval–print loop).
@@ -99,7 +100,13 @@
 			  (igual? (first expre) 'lambda) (cond (< (count (next expre)) 1) (list (list '*error* 'list 'expected nil) amb-global)
 											       (and (not (igual? (fnext expre) nil)) (not (seq? (fnext expre)))) (list (list '*error* 'list 'expected (fnext expre)) amb-global)
 											       true (list expre amb-global))
-			  (igual? (first expre) 'load)()
+			  (igual? (first expre) 'load)(if (= (count expre) 1) (list (list '*error* 'too-few-args) amb-global)
+			  								(cargar-arch amb-global amb-local (second expre)))
+
+			  ;;conditionals
+			  (igual? (first expre) 'or)(cond (= (count (next expre)) 0) (list (list '*error* 'too-few-args) amb-global)
+			  							(= 't (evaluar (next expre) amb-global amb-local)) 't
+										true (if (> (count expre) 2) (evaluar (cons 'or (nnext expre)) amb-global amb-local) nil))
    			  (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
 			  true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local)))
 )
@@ -133,6 +140,9 @@
    												(if (seq? ari) ari
 												(try (eval (first lae)) 
 												     (catch Exception e (list '*error* 'eval-failed-cant-resolve)))))
+							(igual? f 'read)(if (> (count lae) 0)
+							                    (list '*error* 'too-many-args)
+												(read))
 
 							;;logic & math
 							(igual? f 'not)	(let [ari (controlar-aridad lae 2)]
@@ -151,9 +161,7 @@
 							(igual? f 'lt) (try-number-comp < lae)
 							(igual? f 'le) (try-number-comp <= lae)
 							(igual? f 'equal) (try-number-comp igual? lae); works even if they are not numbers (special case)
-							(igual? f 'null) (if (< (count lae) 1)
-							                    (list '*error* 'too-few-args)
-												(reduce (fn [a b](or a b)) (map is-nil? lae)))
+							(igual? f 'null) (try-number-comp igual? (cons nil lae)); same as above woot
 													 
 							;;list
 							(igual? f 'first) (aplicar-fl-lae ffirst lae)
