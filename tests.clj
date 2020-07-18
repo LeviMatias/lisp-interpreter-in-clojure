@@ -64,6 +64,20 @@
     (is (= '(*error* hola "mundo") (imprimir '(*error* hola "mundo")) ))
 )
 
+(deftest test-if
+    (is (first (evaluar '(if (equal 'a 'a) (t) nil ) '(equal equal) nil)) )
+    (is (not (first (evaluar '(if (equal 'b 'a) (t) nil ) '(equal equal) nil))) )
+    (is (not (first (evaluar '(if (equal 'b 'a) (t)) '(equal equal) nil))) )
+    (is (= '(*error* too-few-args) (first (evaluar '(if (equal 'b 'a) ) '(equal equal) nil))) )
+)
+
+(deftest test-or
+    (is (first (evaluar '(or (equal 'b 'a) (equal 'b 'a) (t) ) '() nil) ))
+    (is (first (evaluar '(or (t) ) '() nil) ))
+    (is (not (first (evaluar '(or nil nil nil () nil nil) '() nil) ) ))
+    (is (=  '(*error* too-few-args) (first (evaluar '(or) '() nil))) )
+)
+
 (run-tests)
 
 

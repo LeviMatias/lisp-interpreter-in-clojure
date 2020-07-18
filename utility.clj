@@ -3,7 +3,9 @@
 ))
 
 (defn amb-contains? [amb elem](
-   reduce (fn [a b](or a b)) (in-pairs amb #(= elem (first %)))
+    cond (= 0 (count amb)) nil
+    (= 2 (count amb)) (if (= elem (first amb)) (second amb) nil)
+    true (reduce (fn [a b](or a b)) (in-pairs amb #(= elem (first %))))
 ))
 
 (defn is-nil? [a](
