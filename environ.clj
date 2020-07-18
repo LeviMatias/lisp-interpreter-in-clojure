@@ -1,7 +1,13 @@
 (load-file "utility.clj")
 (load-file "control.clj")
 
-(defn buscar [elem amb](
+(defn get-result-buscar [pair, elem](
+    cond (nil? pair) (list '*error* 'unbound-symbol elem)
+        true (second pair) 
+    )
+)
+
+(defn search-pair [elem, amb](
     reduce ( fn [a b](
             cond (not (nil? a))
                 a 
@@ -12,11 +18,15 @@
         )
     )
     (in-pairs amb #(
-        if (= elem (first %)) (second %) nil
+        if (igual? elem (first %)) (list 'match (second %)) nil
         )
     )
 )
 )
+
+(defn buscar [elem amb](
+    get-result-buscar (search-pair elem amb) elem
+))
 
 
 
@@ -26,7 +36,7 @@
     (amb-contains? amb-global clave)
         (apply concat (
           in-pairs amb-global #(
-            if (= clave (first %)) (list (first %) valor)  % 
+            if (igual? clave (first %)) (list (first %) valor)  % 
             ) 
           )
         )

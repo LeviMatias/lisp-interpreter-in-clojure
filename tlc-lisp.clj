@@ -104,9 +104,14 @@
 			  								(cargar-arch amb-global amb-local (second expre)))
 
 			  ;;conditionals
+			  (igual? (first expre) 'if)(cond (< (count (next expre)) 2) (list (list '*error* 'too-few-args) amb-global)
+			  							(first (evaluar (second expre) amb-global amb-local)) (evaluar (second (next expre)) amb-global amb-local) 
+										true (evaluar (second (nnext expre)) amb-global amb-local) )
 			  (igual? (first expre) 'or)(cond (= (count (next expre)) 0) (list (list '*error* 'too-few-args) amb-global)
 			  							(= 't (evaluar (next expre) amb-global amb-local)) 't
-										true (if (> (count expre) 2) (evaluar (cons 'or (nnext expre)) amb-global amb-local) nil))
+										true (if (> (count expre) 2) 
+											(evaluar (cons 'or (nnext expre)) amb-global amb-local) 
+											nil))
    			  (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
 			  true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local)))
 )
@@ -129,7 +134,7 @@
 		    resu2 (list resu2 amb-global)
 		    true  (if (not (seq? f))
 		              (list (cond
-					  		(igual? f 'terpri) (newline)
+					  		(igual? f 'terpri) (do newline " ")
 							(igual? f 'prin3)(let [ari (controlar-aridad lae 1)]
    												(if (seq? ari) ari
 												(do (prnt (first lae)) (first lae))))
@@ -156,11 +161,11 @@
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce - lae) 
 												     (catch Exception e (list '*error* 'number-expected))))
-							(igual? f 'gt) (do (pr (first lae)) (try-number-comp > lae))
+							(igual? f 'gt) (try-number-comp > lae)
 							(igual? f 'ge) (try-number-comp >= lae)
 							(igual? f 'lt) (try-number-comp < lae)
 							(igual? f 'le) (try-number-comp <= lae)
-							(igual? f 'equal) (try-number-comp igual? lae); works even if they are not numbers (special case)
+							(igual? f 'equal) (try-number-comp igual? lae); works even if they are not numbers
 							(igual? f 'null) (try-number-comp igual? (cons nil lae)); same as above woot
 													 
 							;;list
