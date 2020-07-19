@@ -78,6 +78,19 @@
     (is (=  '(*error* too-few-args) (first (evaluar '(or) '() nil))) )
 )
 
+(deftest test-de-C
+    (is (= '((1 2 3) ((4 5 6) (7 8 9)) (((1 2 3) (4 5 6) (7 8 9)))) (first (evaluar '(C (list first rest list) '((1 2 3)(4 5 6)(7 8 9))) (
+        second (evaluar '(de C (LF X)(
+                    if (null LF) nil 
+                        (cons ((first LF) X) (C (rest LF) X) )
+                    ) 
+                ) '(cons cons if if null null rest rest first first de de list list nil nil) nil
+            ) 
+        ) nil 
+        )) 
+    ))
+)
+
 (run-tests)
 
 

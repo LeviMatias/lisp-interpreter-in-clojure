@@ -33,7 +33,7 @@
       (println "TLC-LISP Version 1.51 for the IBM Personal Computer")
       (println "Copyright (c) 1982, 1983, 1984, 1985 The Lisp Company") (flush)
       (repl '(add add append append cond cond cons cons de de env env equal equal eval eval exit exit
- 			  first first ge ge gt gt if if lambda lambda length length list list load load lt lt nil nil not not
+ 			  first first ge ge gt gt if if lambda lambda length length list list load load le le lt lt nil nil not not
  			  null null or or prin3 prin3 quote quote read read rest rest reverse reverse setq setq sub sub
  			  t t terpri terpri + add - sub)))
    ([amb]  
@@ -101,7 +101,8 @@
 											       (and (not (igual? (fnext expre) nil)) (not (seq? (fnext expre)))) (list (list '*error* 'list 'expected (fnext expre)) amb-global)
 											       true (list expre amb-global))
 			  (igual? (first expre) 'load)(if (= (count expre) 1) (list (list '*error* 'too-few-args) amb-global)
-			  								(cargar-arch amb-global amb-local (second expre)))
+			  								(list true (cargar-arch amb-global amb-local (second expre)))
+											)
 
 			  ;;conditionals
 			  (igual? (first expre) 'if)(cond (< (count (next expre)) 2) (list (list '*error* 'too-few-args) amb-global)
@@ -132,23 +133,23 @@
 ; en caso de haber multiples cuerpos, se llama a aplicar recursivamente, pasando la funcion lambda sin el primer cuerpo, la lista de argumentos evaluados,
 ; el amb. global actualizado con la eval. del 1er. cuerpo (usando el amb. global intacto y el local actualizado con los params. ligados a los args.) y el amb. local intacto. 
 (defn aplicar
-   ([f lae amb-global amb-local](
-    aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local))
+   ([f lae amb-global amb-local](do  (
+    aplicar (revisar-f f) (revisar-lae lae) f lae amb-global amb-local)))
    ([resu1 resu2 f lae amb-global amb-local]
       (cond resu1 (list resu1 amb-global)
 		    resu2 (list resu2 amb-global)
 		    true  (if (not (seq? f))
 		              (list (cond
-					  		(igual? f 'terpri) (do newline " ")
+					  		(igual? f 'terpri) (pr)
 							(igual? f 'prin3)(let [ari (controlar-aridad lae 1)]
    												(if (seq? ari) ari
-												(do (prnt (first lae)) (first lae))))
+												(do (imprimir (first lae)) (first lae))))
   			                (igual? f 'env) (if (> (count lae) 0)
 							                    (list '*error* 'too-many-args)
 												(concat amb-global amb-local))
 							(igual? f 'eval)(let [ari (controlar-aridad lae 1)]
    												(if (seq? ari) ari
-												(try (eval (first lae)) 
+												(try (first (evaluar (first lae) amb-global amb-local)) 
 												     (catch Exception e (list '*error* 'eval-failed-cant-resolve)))))
 							(igual? f 'read)(if (> (count lae) 0)
 							                    (list '*error* 'too-many-args)
@@ -174,7 +175,7 @@
 							(igual? f 'null) (try-number-comp igual? (cons nil lae)); same as above woot
 													 
 							;;list
-							(igual? f 'first) (aplicar-fl-lae ffirst lae)
+							(igual? f 'first) (aplicar-fl-lae first lae)
 							(igual? f 'reverse) (aplicar-fl-lae reverse lae)
 							(igual? f 'length) (aplicar-fl-lae count lae )
 							(igual? f 'rest) (aplicar-fl-lae rest lae)

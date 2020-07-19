@@ -6,7 +6,7 @@
     (cond (seq? ari) ari
         (igual? (first lae) nil) nil
         (not (seq? (first lae))) (list '*error* 'list 'expected (first lae))
-        true (f (first lae))
+        true (f (first lae)) 
     )
 ))
 
