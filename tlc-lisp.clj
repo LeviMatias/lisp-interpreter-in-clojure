@@ -140,10 +140,10 @@
 		    resu2 (list resu2 amb-global)
 		    true  (if (not (seq? f))
 		              (list (cond
-					  		(igual? f 'terpri) (pr)
+					  		(igual? f 'terpri) (newline)
 							(igual? f 'prin3)(let [ari (controlar-aridad lae 1)]
    												(if (seq? ari) ari
-												(do (imprimir (first lae)) (first lae))))
+												(do (prnt pr (first lae)) (flush)) ))
   			                (igual? f 'env) (if (> (count lae) 0)
 							                    (list '*error* 'too-many-args)
 												(concat amb-global amb-local))

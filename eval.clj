@@ -10,7 +10,12 @@
 ))
 
 (defn evaluar-cond [lis amb-global amb-local](
-    cond (is-nil? lis) (list nil amb-global)
-    (first (evaluar (ffirst lis) amb-global amb-local)) (evaluar-secuencia-en-cond (nfirst lis) amb-global amb-local)
-    true (evaluar-cond (rest lis) amb-global amb-local)
-))
+    if (is-nil? lis) (list nil amb-global)
+        (let [res (first (evaluar (ffirst lis) amb-global amb-local))](
+            cond (revisar-f res) res
+                 res (evaluar-secuencia-en-cond (nfirst lis) amb-global amb-local)
+                 true (evaluar-cond (rest lis) amb-global amb-local)
+            )
+        )
+    )
+)

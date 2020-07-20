@@ -2,8 +2,8 @@
 (load-file "utility.clj")
 (load-file "control.clj")
 
-(defn prnt [e](
-    pr (convert-nils e)
+(defn prnt [pf e](
+    pf (convert-nils e)
 ))
 
 
@@ -13,8 +13,7 @@
         (imprimir v v)
     (not= v '\space) 
         (do 
-        (prnt v)
-        (newline)
+        (prnt prn v)
         (flush)
         )
     ) 
@@ -26,7 +25,7 @@
         (flush)
         (convert-nils orig)
     ) true (do
-        (prnt (first lis))
+        (prnt pr (first lis))
         (print \space)
         (imprimir (next lis) orig)
     )
