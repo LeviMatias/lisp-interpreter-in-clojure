@@ -25,9 +25,8 @@
 )
 
 (defn buscar [elem amb](
-    cond (= 0 (count amb)) nil
-    (= 2 (count amb)) (if (= elem (first amb)) (second amb) nil)
-    true (get-result-buscar (search-pair elem amb) elem)
+    if (= 0 (count amb)) (list '*error* 'unbound-symbol elem)
+    (get-result-buscar (search-pair elem amb) elem)
 ))
 
 

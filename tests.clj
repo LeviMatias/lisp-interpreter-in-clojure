@@ -1,12 +1,6 @@
 (require '[clojure.test :refer [is deftest run-tests]])
 
-(load-file "utility.clj")
-(load-file "print.clj")
-(load-file "control.clj")
-(load-file "environ.clj")
-(load-file "eval.clj")
-(load-file "aux-functions.clj")
-(load-file "tlc-lisp.clj")
+(load-file "tlc-lisp-main.clj")
 
 (deftest test-controlar-aridad
     (is (= '(*error* too-few-args) (controlar-aridad '(a b c) 4)))
@@ -53,6 +47,8 @@
     (is (= '(nil (equal equal first first)) (evaluar-cond '(((equal 'a 'b) (setq x 1))) '(equal equal first first) nil) ))
     (is (= '(2 (equal equal setq setq y 2)) (evaluar-cond '(((equal 'a 'b) (setq x 1)) ((equal 'a 'a) (setq y 2))) '(equal equal setq setq) nil )))
     (is (= '(3 (equal equal setq setq y 2 z 3)) (evaluar-cond '(((equal 'a 'b) (setq x 1)) ((equal 'a 'a) (setq y 2) (setq z 3))) '(equal equal setq setq) nil) ))
+    (is (= '(*error* unbound-symbol a) (evaluar-cond '(((equal a 'b) (setq x 1)) ((equal 'a 'a) (setq y 2) (setq z 3))) '(equal equal setq setq) nil) ))
+    (is (= '(*error* unbound-symbol a) (evaluar-cond '(((equal 'a 'b) (setq x 1)) ((equal a 'a) (setq y 2) (setq z 3))) '(equal equal setq setq) nil) ))
 )
 
 (deftest test-imprimir
@@ -66,16 +62,18 @@
 
 (deftest test-if
     (is (first (evaluar '(if (equal 'a 'a) (t) nil ) '(equal equal) nil)) )
-    (is (not (first (evaluar '(if (equal 'b 'a) (t) nil ) '(equal equal) nil))) )
-    (is (not (first (evaluar '(if (equal 'b 'a) (t)) '(equal equal) nil))) )
+    (is (not (first (evaluar '(if (equal 'b 'a) (t) nil ) '(equal equal nil nil) nil))) )
+    (is (not (first (evaluar '(if (equal 'b 'a) (t)) '(equal equal nil nil) nil))) )
     (is (= '(*error* too-few-args) (first (evaluar '(if (equal 'b 'a) ) '(equal equal) nil))) )
+    (is (= '(*error* unbound-symbol b) (first (evaluar '(if (equal b a) 'b 'a) '(equal equal a 1) nil))) )
 )
 
 (deftest test-or
-    (is (first (evaluar '(or (equal 'b 'a) (equal 'b 'a) (t) ) '() nil) ))
-    (is (first (evaluar '(or (t) ) '() nil) ))
-    (is (not (first (evaluar '(or nil nil nil () nil nil) '() nil) ) ))
+    (is (first (evaluar '(or (equal 'b 'a) (equal 'b 'a) t ) '(equal equal t t) nil) ))
+    (is (first (evaluar '(or (t) ) '(t t) nil) ))
+    (is (not (first (evaluar '(or nil nil nil () nil nil) '(nil nil) nil) ) ))
     (is (=  '(*error* too-few-args) (first (evaluar '(or) '() nil))) )
+    (is (= '(*error* unbound-symbol a) (first (evaluar '(or a) '() nil))) )
 )
 
 (deftest test-de-C

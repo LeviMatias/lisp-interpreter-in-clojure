@@ -18,7 +18,7 @@
 
 (defn try-number-comp [f lae](
     let [ari (controlar-aridad lae 2)]
-    (if (seq? ari) ari
+    (if (seq? ari)  ari
     (try (run-comp f lae) 
             (catch Exception e (list '*error* 'number-expected))))
 ))

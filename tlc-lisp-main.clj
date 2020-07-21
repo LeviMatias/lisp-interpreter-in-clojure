@@ -105,19 +105,21 @@
 											)
 
 			  ;;conditionals
-			  (igual? (first expre) 'if)(cond (< (count (next expre)) 2) (list (list '*error* 'too-few-args) amb-global)
-			  							(first (evaluar (second expre) amb-global amb-local)) (evaluar (second (next expre)) amb-global amb-local) 
-										true (evaluar (second (nnext expre)) amb-global amb-local) )
+			  (igual? (first expre) 'if)(if (< (count (next expre)) 2) (list (list '*error* 'too-few-args) amb-global)
+			  							(let [res (evaluar (second expre) amb-global amb-local)] (
+											cond (revisar-f (first res)) res
+											(first res) (evaluar (second (next expre)) amb-global amb-local) 
+											true (if (> (count expre) 3)   
+												(evaluar (second (nnext expre)) amb-global amb-local) 
+												(list nil amb-global))))) 
 			  (igual? (first expre) 'or)(if (= (count (next expre)) 0) (list (list '*error* 'too-few-args) amb-global)
 			  							(let [res (evaluar (second expre) amb-global amb-local)] (
-											cond (= 't (first res)) (list true amb-global)
+											cond (revisar-f (first res)) res
+											(= 't (first res)) (list true amb-global)
 											(= true (first res )) (list true amb-global)
 											true (if (> (count expre) 2) 
 												(evaluar (cons 'or (nnext expre)) amb-global amb-local) 
-												(list nil amb-global) 
-												)
-											))
-										)
+												(list nil amb-global)))))
    			  (igual? (first expre) 'cond) (evaluar-cond (next expre) amb-global amb-local)
 			  true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local)))
 )
@@ -156,7 +158,7 @@
 												(read))
 
 							;;logic & math
-							(igual? f 'not)	(let [ari (controlar-aridad lae 2)]
+							(igual? f 'not)	(let [ari (controlar-aridad lae 1)]
    												(if (seq? ari) ari
 												(not (first lae))))
 							(igual? f 'add) (if (< (count lae) 2)
