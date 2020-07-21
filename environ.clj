@@ -1,32 +1,16 @@
 (load-file "utility.clj")
 (load-file "control.clj")
 
-(defn get-result-buscar [pair, elem](
-    cond (nil? pair) (list '*error* 'unbound-symbol elem)
-        true (second pair) 
-    )
-)
-
-(defn search-pair [elem, amb](
-    reduce ( fn [a b](
-            cond (not (nil? a))
-                a 
-            (not (nil? b))
-                b 
-            true
-                nil
-        )
-    )
-    (in-pairs amb #(
-        if (igual? elem (first %)) (list 'match (second %)) nil
-        )
-    )
+(defn search-pair [elem, amb-pairs](
+    cond (is-nil? amb-pairs) (list '*error* 'unbound-symbol elem)
+    (igual? (ffirst amb-pairs) elem) (second (first amb-pairs))
+    true (search-pair elem (next amb-pairs))
 )
 )
 
 (defn buscar [elem amb](
     if (= 0 (count amb)) (list '*error* 'unbound-symbol elem)
-    (get-result-buscar (search-pair elem amb) elem)
+    (search-pair elem (partition 2 amb))
 ))
 
 
