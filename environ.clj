@@ -9,8 +9,7 @@
 )
 
 (defn buscar [elem amb](
-    if (= 0 (count amb)) (list '*error* 'unbound-symbol elem)
-    (search-pair elem (partition 2 amb))
+    search-pair elem (partition 2 amb)
 ))
 
 
