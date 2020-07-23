@@ -8,16 +8,18 @@
 )
 )
 
-(defn buscar [elem amb](
-    search-pair elem (partition 2 amb)
+(defn buscar [elem amb]( 
+    search-pair elem (partition 2 amb) 
 ))
 
-
+(defn amb-contains? [elem amb](
+    not (seq? (buscar elem amb))
+))
 
 (defn actualizar-amb [amb-global clave valor]
     (cond (revisar-f valor)
         amb-global
-    (amb-contains? amb-global clave)
+    (amb-contains? clave amb-global)
         (apply concat (
           in-pairs amb-global #(
             if (igual? clave (first %)) (list (first %) valor)  % 
@@ -28,3 +30,4 @@
         (concat amb-global (list clave valor))
     )
 )
+

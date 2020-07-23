@@ -1,3 +1,4 @@
+;Levi Fernandez Matias 99119
 (declare evaluar)
 (declare aplicar)
 (declare controlar-aridad)
@@ -11,17 +12,10 @@
 (declare evaluar-cond)
 (declare evaluar-secuencia-en-cond)
 
-
 ;;Utility functions----------------------------------------------------------------
 
 (defn in-pairs[l f](
   map f (partition 2 l)
-))
-
-(defn amb-contains? [amb elem](
-    cond (= 0 (count amb)) nil
-    (= 2 (count amb)) (if (= elem (first amb)) (second amb) nil)
-    true (reduce (fn [a b](or a b)) (in-pairs amb #(= elem (first %))))
 ))
 
 (defn is-nil? [a](
@@ -126,16 +120,14 @@
 )
 )
 
-(defn buscar [elem amb](
-    search-pair elem (partition 2 amb)
-))
+(defn buscar [elem amb](search-pair elem (partition 2 amb) ))
 
-
+(defn amb-contains? [elem amb](not (seq? (buscar elem amb))))
 
 (defn actualizar-amb [amb-global clave valor]
     (cond (revisar-f valor)
         amb-global
-    (amb-contains? amb-global clave)
+    (amb-contains? clave amb-global)
         (apply concat (
           in-pairs amb-global #(
             if (igual? clave (first %)) (list (first %) valor)  % 
@@ -146,6 +138,7 @@
         (concat amb-global (list clave valor))
     )
 )
+
 
 ;;eval conditionals functions----------------------------------------------------------------
 
