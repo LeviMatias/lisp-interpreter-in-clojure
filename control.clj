@@ -21,10 +21,10 @@
     (= (count lis) 0) 'nil
     true
     (reduce (fn [a b] (
-        cond (and (revisar-f a))
-            a
-        (revisar-f b)
+        cond (and (revisar-f b))
             b
+        (revisar-f a)
+            a
         true
             nil
     )) lis )

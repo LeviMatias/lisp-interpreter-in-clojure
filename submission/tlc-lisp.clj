@@ -122,7 +122,7 @@
 
 (defn buscar [elem amb](search-pair elem (partition 2 amb) ))
 
-(defn amb-contains? [elem amb](not (seq? (buscar elem amb))))
+(defn amb-contains? [elem amb](not (revisar-f (buscar elem amb))))
 
 (defn actualizar-amb [amb-global clave valor]
     (cond (revisar-f valor)
@@ -204,7 +204,7 @@
       (repl '(add add append append cond cond cons cons de de env env equal equal eval eval exit exit
  			  first first ge ge gt gt if if lambda lambda length length list list load load le le lt lt nil nil not not
  			  null null or or prin3 prin3 quote quote read read rest rest reverse reverse setq setq sub sub
- 			  t t terpri terpri + add - sub)))
+ 			  t t terpri terpri + add - sub add1 add1)))
    ([amb]  
       (print ">>> ") (flush)
       (try (let [res (evaluar (read) amb nil)]
@@ -293,6 +293,10 @@
 			  true (aplicar (first (evaluar (first expre) amb-global amb-local)) (map (fn [x] (first (evaluar x amb-global amb-local))) (next expre)) amb-global amb-local)))
 )
 
+;
+;add1, recibe un numero y devuelve el siguiente
+;
+
 ; Aplica una funcion a una lista de argumentos evaluados, usando los ambientes global y local. Siempre retorna una lista con un resultado y un ambiente.
 ; Si la aplicacion falla, el resultado es una lista con '*error* como primer elemento, por ejemplo: (list '*error* 'arg-wrong-type) y el ambiente es el ambiente global.
 ; Aridad 4: Recibe la func., la lista de args. evaluados y los ambs. global y local. Se llama recursivamente agregando 2 args.: la func. revisada y la lista de args. revisada.
@@ -313,8 +317,10 @@
 		              (list (cond
 					  		(igual? f 'terpri) (newline)
 							(igual? f 'prin3)(let [ari (controlar-aridad lae 1)]
-   												(if (seq? ari) ari
-												(do (prnt pr (first lae)) (flush)) ))
+   												(cond (seq? ari) ari
+												 (string? (first lae))(do (prnt print (first lae)) (flush)) 
+                                                 true (do (prnt pr (first lae)) (flush)) 
+                                                 ))
   			                (igual? f 'env) (if (> (count lae) 0)
 							                    (list '*error* 'too-many-args)
 												(concat amb-global amb-local))
@@ -334,6 +340,10 @@
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce + lae) 
 												     (catch Exception e (list '*error* 'number-expected))))
+                            (igual? f 'add1) (let [ari (controlar-aridad lae 1)]
+   												(if (seq? ari) ari
+							                    (try (reduce + (conj 1 lae)) 
+												     (catch Exception e (list '*error* 'number-expected)))))
 							(igual? f 'sub) (if (< (count lae) 2)
 							                    (list '*error* 'too-few-args)
 							                    (try (reduce - lae) 
