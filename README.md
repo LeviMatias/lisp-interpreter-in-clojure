@@ -7,7 +7,9 @@ This program works under a simple read-eval print loop (repl function) which del
 to run(requires clojure to be installed):
 >
 >clj
+>
 >(load-file "tlc-lisp-main.clj")
+>
 >(repl)
 >
 TLC Lisp folder contains the corresponding version of Lisp this program is trying to emulate.
